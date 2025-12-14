@@ -4,9 +4,9 @@ Placeholder summary.
 
 ## Features
 
-- **Placeholder Feature 1**: Placeholder descrtiption.
-- **Placeholder Feature 2**: Placeholder descrtiption.
-- **Placeholder Feature 3**: Placeholder descrtiption.
+- **Placeholder Feature 1**: Placeholder description.
+- **Placeholder Feature 2**: Placeholder description.
+- **Placeholder Feature 3**: Placeholder description.
 
 ## Installation
 
@@ -69,10 +69,4 @@ mypy .
 ```bash
 ruff format .
 ```
-
-## Previous Hands-On Exercise
-
-Separately from the above, please see below a link to a public GitHub repository that contains my work from the previous hands-on exercise (Dungeons & Dragons): 
-
-https://github.com/vzlotnikovs/Turing_DND_Practice
 
