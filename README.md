@@ -1,12 +1,23 @@
 # Interview Practice App
 
-Placeholder summary.
+Target audience: user preparing for a job interview.
+
+Workflow: 
+
+1. User pastes or uploads a job description.
+2. User defines the number and difficulty of interview questions to be generated.
+3. The app analyzes the job description and generates a list of questions that are likely to be asked in an interview for that job.
+4. The app allows the user to attempt to answer each question and uses OpenAI API to evaluate the answer and provide feedback.
+5. The app saves the user's answers and the feedback in a file.
+6. The app allows the user to view the user's answers and the feedback.
 
 ## Features
 
-- **Placeholder Feature 1**: Placeholder description.
-- **Placeholder Feature 2**: Placeholder description.
-- **Placeholder Feature 3**: Placeholder description.
+- **Job description analysis**: Analyze a pasted or uploaded job description and generate a list of questions that are likely to be asked in an interview for that job.
+- **Question generation**: Generate a list of questions that are likely to be asked in an interview for that job. The number of questions and difficulty of questions are user-defined.
+- **Question evaluation**: Evaluate the user's answers and provide feedback.
+- **Question saving**: Save the user's answers and the feedback in a file.
+- **Question viewing**: View the user's answers and the feedback.
 
 ## Installation
 
