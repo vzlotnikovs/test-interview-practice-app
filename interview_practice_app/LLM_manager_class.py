@@ -13,7 +13,7 @@ OPENAI_MODEL = "gpt-4.1-nano"
 
 class LLM_Manager:
     """
-    Manages all interactions with the LLM as part of the interview practice app.
+    Manages all interactions with the LLM as part of the interview practice.
 
     The class has two main methods:
     - generate_questions: Generates a list of questions based on the job description provided by the user (copy-pasted or uploaded).
