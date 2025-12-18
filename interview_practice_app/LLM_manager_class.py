@@ -71,18 +71,18 @@ class LLM_Manager:
             raise ValueError("OpenAI returned empty response - try again.")
         return response.output_text
 
-    def generate_questions(LLM_input: str, LLM_instructions: str) -> str:
+    def generate_questions(job_description: str, number_of_questions: int, difficulty_level: str) -> str:
         """
         Generates a list of questions based on the job description provided by the user (copy-pasted or uploaded).
 
         Args:
             job_description (str): The job description provided by the user (copy-pasted or uploaded).
-            num_questions (int): The number of questions to generate.
-            difficulty (str): The difficulty of the questions to generate.
+            number_of_questions (int): The number of questions to generate.
+            difficulty_level (str): The difficulty of the questions to generate.
 
         Returns:
             list[str]: A list of questions generated based on the job description.
         """
         print("Generating question(s) using OpenAI Responses API - please wait...")
-        data = self._safe_api_call(LLM_instructions, LLM_input)
+        data = self._safe_api_call(LLM_instructions, job_description)
         return data
