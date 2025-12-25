@@ -815,6 +815,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "dotenv" },
+    { name = "jinja2" },
     { name = "openai" },
     { name = "ruff" },
     { name = "streamlit" },
@@ -823,6 +824,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "openai", specifier = ">=2.11.0" },
     { name = "ruff", specifier = ">=0.14.9" },
     { name = "streamlit", specifier = ">=1.52.1" },
