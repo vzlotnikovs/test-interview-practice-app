@@ -30,6 +30,8 @@ class Interview_Manager:
         Returns:
             list[Question]: A list of accepted and/or modified Question objects.
         """
+        ...
+        '''
         if len(generated_questions) == 1:
             st.write("In total, 1 question has been generated - please review:")
         else:
@@ -62,3 +64,4 @@ class Interview_Manager:
             else:
                 st.write("The question has been rejected.")
         return self._list_of_questions
+        '''

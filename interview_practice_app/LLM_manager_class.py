@@ -1,5 +1,7 @@
+import streamlit as st
 import os
 import json
+import re
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -8,8 +10,24 @@ from tenacity import (
 )
 from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
+from pydantic import BaseModel
+from typing import List
 
-OPENAI_MODEL = "gpt-4.1-nano"
+OPENAI_MODEL = "gpt-5-nano"
+LLM_PROMPTS_DIR = "interview_practice_app/LLM_prompts"
+OUTPUT_DIR = "interview_practice_app/output"
+
+class Question(BaseModel):
+    company_name: str
+    job_title: str
+    question: str
+    difficulty_level: str
+    category: str
+    answer_guide: str
+
+class QuestionsList(BaseModel):
+    questions: List[Question]
 
 class LLM_Manager:
     """
@@ -59,19 +77,26 @@ class LLM_Manager:
         reraise=True,
     )
 
-    def _safe_api_call(self: OpenAI, instructions: str, input_text: str) -> str:
+    def _safe_api_call(self, instructions_text: str, input_text: str) -> QuestionsList:
         """Internal wrapper for API call with retries."""
-        response = self.responses.create(
+        response = self._client.responses.parse(
             model=OPENAI_MODEL,
-            instructions=instructions,
+            instructions=instructions_text,
             input=input_text,
             temperature=1,
+            text_format=QuestionsList,
         )
-        if not response.output_text:
+        if not response.output_parsed:
             raise ValueError("OpenAI returned empty response - try again.")
-        return response.output_text
+        return response.output_parsed
 
-    def generate_questions(job_description: str, number_of_questions: int, difficulty_level: str) -> str:
+    def generate_questions(
+        self,
+        job_description: str,
+        number_of_questions: int,
+        difficulty_level: str,
+        output_path: str | None = None
+    ) -> QuestionsList:
         """
         Generates a list of questions based on the job description provided by the user (copy-pasted or uploaded).
 
@@ -79,10 +104,51 @@ class LLM_Manager:
             job_description (str): The job description provided by the user (copy-pasted or uploaded).
             number_of_questions (int): The number of questions to generate.
             difficulty_level (str): The difficulty of the questions to generate.
+            output_path (str | None): The path to save the generated questions.
 
         Returns:
-            list[str]: A list of questions generated based on the job description.
+            QuestionsList: A list of questions generated based on the job description.
         """
-        print("Generating question(s) using OpenAI Responses API - please wait...")
-        data = self._safe_api_call(LLM_instructions, job_description)
-        return data
+        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_DIR))
+        template = env.get_template("input_prompt.txt")
+        
+        LLM_instructions = template.render(
+            {
+                "job_description": job_description, 
+                "number_of_questions": number_of_questions, 
+                "difficulty_level": difficulty_level,
+            }
+        )
+        
+        st.write("Generating question(s) using OpenAI Responses API - please wait...")
+        questions_list = self._safe_api_call(
+            instructions_text=LLM_instructions,
+            input_text=job_description
+        )
+        # Extract company/job from first question for filename (fallback to defaults)
+        first_question = questions_list.questions[0] if questions_list.questions else None
+        company_slug = first_question.company_name if first_question and first_question.company_name != "Undefined" else "unknown_company"
+        job_slug = first_question.job_title if first_question and first_question.job_title != "Undefined" else "unknown_role"
+        
+        # SANITIZE: Remove invalid filename characters and limit length
+        def sanitize_filename(name: str) -> str:
+            # Remove/replace invalid characters: / \ : * ? " < > |
+            name = re.sub(r'[<>:"/\\|?*]', '_', name)
+            # Replace multiple spaces/slashes with single underscore
+            name = re.sub(r'\s+[/\s]+', '_', name)
+            # Trim and limit length (Windows max ~260 chars)
+            name = name.strip().replace(' ', '_')[:50]
+            return name if name else "unknown"
+
+        company_filename = sanitize_filename(company_slug)
+        job_filename = sanitize_filename(job_slug)
+                
+        if output_path is None:
+            os.makedirs(OUTPUT_DIR, exist_ok=True)
+            file_name = f"questions_{company_filename}_{job_filename}_{number_of_questions}_{difficulty_level}.json" 
+            output_path = os.path.join(OUTPUT_DIR, file_name)
+        
+        with open(output_path, "w") as f:
+            json.dump(questions_list.model_dump(), f, indent=2)
+        st.write("Questions have been successfully generated and saved.")
+        return questions_list
