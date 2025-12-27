@@ -1,3 +1,4 @@
 *.env
 .venv/
 interview_practice_app/__pycache__/
+interview_practice_app/output/

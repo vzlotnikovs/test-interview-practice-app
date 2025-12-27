@@ -29,6 +29,10 @@ class Question(BaseModel):
 class QuestionsList(BaseModel):
     questions: List[Question]
 
+
+class Feedback(BaseModel):
+    feedback_text: str
+
 class LLM_Manager:
     """
     Manages all interactions with the LLM as part of the interview practice.
@@ -77,14 +81,27 @@ class LLM_Manager:
         reraise=True,
     )
 
-    def _safe_api_call(self, instructions_text: str, input_text: str) -> QuestionsList:
-        """Internal wrapper for API call with retries."""
+    def _safe_api_call(self, instructions_text: str, input_text: str, response_format: type[BaseModel]) -> BaseModel:
+        """
+        Internal wrapper for API call with retries.
+
+        Args:
+            instructions_text (str): The system instructions for the LLM.
+            input_text (str): The user input text.
+            response_format (type[BaseModel]): The Pydantic model class to enforce structure.
+
+        Returns:
+            BaseModel: The parsed response instance of the specified model.
+
+        Raises:
+            ValueError: If the response cannot be parsed or is empty.
+        """
         response = self._client.responses.parse(
             model=OPENAI_MODEL,
             instructions=instructions_text,
             input=input_text,
             temperature=1,
-            text_format=QuestionsList,
+            text_format=response_format,
         )
         if not response.output_parsed:
             raise ValueError("OpenAI returned empty response - try again.")
@@ -123,7 +140,8 @@ class LLM_Manager:
         st.write("Generating question(s) using OpenAI Responses API - please wait...")
         questions_list = self._safe_api_call(
             instructions_text=LLM_instructions,
-            input_text=job_description
+            input_text=job_description,
+            response_format=QuestionsList
         )
         # Extract company/job from first question for filename (fallback to defaults)
         first_question = questions_list.questions[0] if questions_list.questions else None
@@ -132,6 +150,15 @@ class LLM_Manager:
         
         # SANITIZE: Remove invalid filename characters and limit length
         def sanitize_filename(name: str) -> str:
+            """
+            Sanitizes a string to be safe for use as a filename.
+
+            Args:
+                name (str): The original string (e.g., company or job title).
+
+            Returns:
+                str: A sanitized string with invalid characters removed or replaced.
+            """
             # Remove/replace invalid characters: / \ : * ? " < > |
             name = re.sub(r'[<>:"/\\|?*]', '_', name)
             # Replace multiple spaces/slashes with single underscore
@@ -148,7 +175,42 @@ class LLM_Manager:
             file_name = f"questions_{company_filename}_{job_filename}_{number_of_questions}_{difficulty_level}.json" 
             output_path = os.path.join(OUTPUT_DIR, file_name)
         
+        # Save path to session state for other modules to access
+        if "questions_file_path" not in st.session_state:
+            st.session_state.questions_file_path = output_path
+        else:
+            st.session_state.questions_file_path = output_path
+
         with open(output_path, "w") as f:
             json.dump(questions_list.model_dump(), f, indent=2)
         st.write("Questions have been successfully generated and saved.")
         return questions_list
+    
+    def evaluate_answer(self, question: Question, user_answer: str) -> Feedback:
+        """
+        Evaluates the user's answer to a question and provides feedback.
+
+        Args:
+            question (Question): The question object containing the question and answer guide.
+            user_answer (str): The user's answer to the question.
+
+        Returns:
+            Feedback: The feedback object containing the feedback text.
+        """
+        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_DIR))
+        template = env.get_template("evaluation_prompt.txt")
+
+        LLM_instructions = template.render(
+            {
+                "question": question.question,
+                "answer_guide": question.answer_guide,
+                "user_answer": user_answer
+            }
+        )
+        
+        feedback = self._safe_api_call(
+            instructions_text=LLM_instructions,
+            input_text=user_answer,
+            response_format=Feedback
+        )
+        return feedback
