@@ -169,11 +169,7 @@ class Interview_Manager:
             
             if st.button("Start New Session"):
                 # Reset state
-                st.session_state.current_q_index = 0
-                st.session_state.interview_results = []
-                st.session_state.feedback_received = False
-                if "results_saved" in st.session_state:
-                    del st.session_state.results_saved
+                st.session_state.clear()
                 st.rerun()
 
         
