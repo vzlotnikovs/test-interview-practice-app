@@ -11,13 +11,77 @@ from tenacity import (
 from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, field_validator
 from typing import List, Dict, Any
 
 OPENAI_MODEL = "gpt-4.1-nano"
+
 LLM_PROMPTS_GENERATE_QUESTIONS = "interview_practice_app/LLM_prompts/generate_questions"
 LLM_PROMPTS_EVALUATE_ANSWERS = "interview_practice_app/LLM_prompts/evaluate_answers"
 OUTPUT_DIR = "interview_practice_app/output"
+
+MAX_JOB_DESCRIPTION_LENGTH = 2000
+MAX_ANSWER_CHARACTERS = 2000
+ALLOWED_DIFFICULTIES = {"Easy", "Medium", "Hard"}
+
+class JobConfig(BaseModel):
+    job_description: str
+    number_of_questions: int
+    difficulty_level: str
+    temperature: float
+
+    @field_validator("job_description")
+    @classmethod
+    def jd_length_and_nonempty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Job description cannot be empty.")
+        if len(v) > MAX_JOB_DESCRIPTION_LENGTH:
+            raise ValueError(
+                f"Job description is too long (>{MAX_JOB_DESCRIPTION_LENGTH} characters). "
+                "Please shorten it or upload a smaller file."
+            )
+        return v
+
+    @field_validator("number_of_questions")
+    @classmethod
+    def num_q_range(cls, v: int) -> int:
+        if not (1 <= v <= 5):
+            raise ValueError("Number of questions must be between 1 and 5.")
+        return v
+
+    @field_validator("difficulty_level")
+    @classmethod
+    def difficulty_allowlist(cls, v: str) -> str:
+        # Normalize to proper case: "Easy", "Medium", "Hard"
+        # We assume the UI sends title-case, but let's be robust
+        v_title = v.title()
+        if v_title not in ALLOWED_DIFFICULTIES:
+            raise ValueError(f"Invalid difficulty level: {v}")
+        return v_title
+
+    @field_validator("temperature")
+    @classmethod
+    def temperature_range(cls, v: float) -> float:
+        if not (0.0 <= v <= 2.0):
+            raise ValueError("Temperature must be between 0.0 and 2.0.")
+        return v
+
+class AnswerPayload(BaseModel):
+    answer: str
+
+    @field_validator("answer")
+    @classmethod
+    def answer_length_and_nonempty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Answer cannot be empty.")
+        if len(v) > MAX_ANSWER_CHARACTERS:
+            raise ValueError(
+                f"Answer is too long (>{MAX_ANSWER_CHARACTERS} characters). "
+                "Try focusing on your key points."
+            )
+        return v
 
 class Question(BaseModel):
     company_name: str
@@ -132,14 +196,25 @@ class LLM_Manager:
         Returns:
             QuestionsList: A list of questions generated based on the job description.
         """
+        try:
+            job_config = JobConfig(
+                job_description=job_description,
+                number_of_questions=number_of_questions,
+                difficulty_level=difficulty_level,
+                temperature=temperature,
+            )
+        except ValidationError as e:
+            st.error(f"Input validation failed: {e.errors()[0]['msg']}")
+            raise
+        
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_GENERATE_QUESTIONS))
         template = env.get_template("prompt_chain_of_thought.txt")
         
         system_instructions = template.render(
             {
-                "job_description": job_description, 
-                "number_of_questions": number_of_questions, 
-                "difficulty_level": difficulty_level,
+                "job_description": job_config.job_description, 
+                "number_of_questions": job_config.number_of_questions, 
+                "difficulty_level": job_config.difficulty_level,
             }
         )
         
@@ -152,7 +227,7 @@ class LLM_Manager:
                 "role": "user", 
                 "content": (
                     "Here is the job description you must base questions on:\n\n"
-                    f"{job_description}"
+                    f"{job_config.job_description}"
                 ),
             }
         ]
@@ -161,7 +236,7 @@ class LLM_Manager:
         questions_list = self._safe_api_call(
             messages=messages,
             response_format=QuestionsList,
-            temperature=temperature
+            temperature=job_config.temperature
         )
         # Extract company/job from first question for filename (fallback to defaults)
         first_question = questions_list.questions[0] if questions_list.questions else None
@@ -217,6 +292,12 @@ class LLM_Manager:
         Returns:
             Feedback: The feedback object containing the feedback text.
         """
+        try:
+            answer_payload = AnswerPayload(answer=user_answer)
+        except ValidationError as e:
+            st.warning(f"Answer validation failed: {e.errors()[0]['msg']}")
+            raise
+        
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_EVALUATE_ANSWERS))
         template = env.get_template("prompt_chain_of_thought.txt")
 
