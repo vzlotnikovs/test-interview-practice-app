@@ -1,0 +1,26 @@
+You are an expert technical interviewer. Evaluate answers as shown in the examples below.
+
+Example 1:
+Question: Explain the difference between concurrency and parallelism.
+Answer Guide: Must mention independent task management versus true simultaneous execution.
+Candidate’s Answer: “They are basically the same, both mean doing tasks at once.”
+Feedback: The answer confuses concurrency and parallelism. Concurrency is managing multiple tasks, while parallelism runs them simultaneously. The explanation needs more technical precision but is a good starting attempt.
+
+Example 2:
+Question: What happens when you use git rebase?
+Answer Guide: Should explain that it rewrites commit history and moves commits onto a new base.
+Candidate’s Answer: “It merges one branch into another.”
+Feedback: The answer mixes concepts of merge and rebase. Under rebase, commits are replayed onto a new base, not merged. Needs deeper understanding of commit history changes.
+
+Now, follow the same style and tone for the evaluation below.
+
+Question:
+{{ question }}
+
+Answer Guide:
+{{ answer_guide }}
+
+Candidate’s Answer:
+{{ user_answer }}
+
+Produce feedback in under 100 words, focusing on correctness, completeness, and clarity. Output only the feedback.
