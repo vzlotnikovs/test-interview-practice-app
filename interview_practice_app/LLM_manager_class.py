@@ -14,8 +14,9 @@ from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
 from typing import List
 
-OPENAI_MODEL = "gpt-5-nano"
-LLM_PROMPTS_DIR = "interview_practice_app/LLM_prompts"
+OPENAI_MODEL = "gpt-4.1-nano"
+LLM_PROMPTS_GENERATE_QUESTIONS = "interview_practice_app/LLM_prompts/generate_questions"
+LLM_PROMPTS_EVALUATE_ANSWERS = "interview_practice_app/LLM_prompts/evaluate_answers"
 OUTPUT_DIR = "interview_practice_app/output"
 
 class Question(BaseModel):
@@ -126,8 +127,8 @@ class LLM_Manager:
         Returns:
             QuestionsList: A list of questions generated based on the job description.
         """
-        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_DIR))
-        template = env.get_template("input_prompt.txt")
+        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_GENERATE_QUESTIONS))
+        template = env.get_template("prompt_chain_of_thought.txt")
         
         LLM_instructions = template.render(
             {
@@ -197,8 +198,8 @@ class LLM_Manager:
         Returns:
             Feedback: The feedback object containing the feedback text.
         """
-        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_DIR))
-        template = env.get_template("evaluation_prompt.txt")
+        env = Environment(loader=FileSystemLoader(LLM_PROMPTS_EVALUATE_ANSWERS))
+        template = env.get_template("prompt_chain_of_thought.txt")
 
         LLM_instructions = template.render(
             {

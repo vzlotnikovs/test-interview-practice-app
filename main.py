@@ -90,17 +90,15 @@ def main() -> None:
             if generated_questions:
                 st.session_state.generated_questions = generated_questions
                 st.success("Questions generated successfully.")
-            st.subheader("Step 4: Practice answering the questions and get feedback from OpenAI.")
-            st.write("Your answers and feedback will be automatically saved.")
             
             if "questions_file_path" in st.session_state:
+                st.subheader("Step 4: Practice answering the questions and get feedback from OpenAI.")
+                st.write("Your answers and feedback will be automatically saved.")
+                
                 st.button("Start Practice Interview", key="start_practice", on_click=lambda: st.session_state.update({"practice_active": True}))
 
-            if st.session_state.get("practice_active"):
-                if "questions_file_path" in st.session_state:
+                if st.session_state.get("practice_active"):
                     interview_manager.practice_interview(st.session_state.questions_file_path, llm_manager)
-                else:
-                    st.error("Please generate questions first.")
 
 if __name__ == "__main__":
     main()

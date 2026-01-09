@@ -10,9 +10,10 @@ Answer Guide (what to look for):
 Candidate's Answer:
 {{ user_answer }}
 
-Please provide constructive feedback in less than 200 words:
-- Compare the answer to the answer guide.
+Step 1: Provide constructive feedback in less than 100 words by comparing the answer to the answer guide.
 - Highlight what was good.
 - Point out what was missing or could be improved.
 - Be encouraging but strict on technical accuracy.
 - Do not provide a rating.
+
+Step 2: Output ONLY the feedback. No notes or surrounding text.

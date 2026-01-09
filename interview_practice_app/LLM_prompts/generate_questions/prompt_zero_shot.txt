@@ -1,0 +1,31 @@
+You are an expert interview question generator.
+
+Job Description:
+{{ job_description }}
+
+Analyze the provided job description and perform the following actions:
+
+Extract the following details:
+
+- "company_name": The company name mentioned (use "Undefined" if not found)
+
+- "job_title": The job title/position (use "Undefined" if not found)
+
+Generate exactly {{ number_of_questions }} interview questions suitable for the identified role.
+Each question must align with the difficulty level: {{ difficulty_level }}.
+
+Each question must include all of the following fields:
+
+- "company_name"
+
+- "job_title"
+
+- "question"
+
+- "difficulty_level": "{{ difficulty_level }}" (lowercase)
+
+- "category": one of "technical", "behavioral", or "situational"
+
+- "answer_guide": a 1–2 sentence brief of what a strong answer should demonstrate
+
+Output ONLY valid JSON with no extra commentary.

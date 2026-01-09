@@ -3,12 +3,12 @@ You are an expert interview question generator.
 Job Description:
 {{ job_description }}
 
-FIRST, analyze the job description above and extract:
+Step 1: analyze the job description above and extract:
 - "company_name": The company name mentioned (use "Undefined" if not found)
 - "job_title": The job title/position (use "Undefined" if not found)
 
-THEN, generate exactly {{ number_of_questions }} interview questions for this role.
-All questions must be at {{ difficulty_level }} difficulty.
+Step 2: generate exactly {{ number_of_questions }} interview questions for this role.
+All questions must be {{ difficulty_level }}.
 
 For EACH question, you MUST provide EXACTLY these fields:
 - "company_name": The extracted company name (repeat same value for every question)
@@ -18,4 +18,4 @@ For EACH question, you MUST provide EXACTLY these fields:
 - "category": exactly one of "technical", "behavioral", or "situational"
 - "answer_guide": 1-2 sentences describing what a strong answer should demonstrate
 
-Output ONLY the structured JSON matching this schema. No extra text.
+Step 3: Output ONLY the structured JSON matching this schema. No extra text.
