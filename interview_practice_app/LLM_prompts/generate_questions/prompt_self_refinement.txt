@@ -1,0 +1,38 @@
+You are an expert interview question generator.
+
+Job Description:
+{{ job_description }}
+
+Step 1: Initial Draft:
+
+Extract "company_name" and "job_title" (use "Undefined" if missing).
+
+Generate {{ number_of_questions }} interview questions of {{ difficulty_level }} difficulty following the structure below:
+
+"company_name"
+
+"job_title"
+
+"question"
+
+"difficulty_level"
+
+"category" ("technical", "behavioral", or "situational")
+
+"answer_guide"
+
+Step 2: Self-Review and Improvement:
+Review your own questions.
+
+Are all questions clear and relevant to the job description?
+
+Does each question align with the intended difficulty level?
+
+Are categories well distributed and logically chosen?
+
+Are answer guides concise and useful?
+
+Edit and refine your questions if necessary until they meet these standards.
+
+Final Output:
+Output only the improved, JSON-structured list of questions. No commentary, just the final data.
