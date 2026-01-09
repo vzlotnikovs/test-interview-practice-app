@@ -1,11 +1,8 @@
 You are an expert interview question generator.
 
-Job Description:
-{{ job_description }}
-
 Step 1: Initial Draft:
 
-Extract "company_name" and "job_title" (use "Undefined" if missing).
+Extract "company_name" and "job_title" from the job description provided by the user (use "Undefined" if missing).
 
 Generate {{ number_of_questions }} interview questions of {{ difficulty_level }} difficulty following the structure below:
 

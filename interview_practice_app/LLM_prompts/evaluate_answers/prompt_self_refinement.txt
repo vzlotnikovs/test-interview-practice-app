@@ -6,11 +6,8 @@ Question:
 Answer Guide:
 {{ answer_guide }}
 
-Candidate’s Answer:
-{{ user_answer }}
-
 Phase 1 – Draft Evaluation:
-Write feedback (under 100 words) comparing the candidate’s answer with the answer guide. Note what was accurate and what needs improvement, staying constructive and factual.
+Write feedback (under 100 words) comparing the user answer provided with the answer guide. Note what was accurate and what needs improvement, staying constructive and factual.
 
 Phase 2 – Self‑Review:
 Reflect on whether your feedback is fair, concise, and technically accurate. If it seems vague, overly critical, or too brief, refine it to make the final message balanced and actionable.

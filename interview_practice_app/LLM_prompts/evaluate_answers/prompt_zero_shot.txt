@@ -6,10 +6,7 @@ Question:
 Answer Guide (what to look for):
 {{ answer_guide }}
 
-Candidate's Answer:
-{{ user_answer }}
-
-Evaluate the candidate’s answer based solely on the provided answer guide and provide concise, constructive feedback (under 100 words).
+Evaluate the user answer provided based solely on the provided answer guide and provide concise, constructive feedback (under 100 words).
 
 Highlight what was strong or correct.
 

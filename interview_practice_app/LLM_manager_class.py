@@ -12,7 +12,7 @@ from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict, Any
 
 OPENAI_MODEL = "gpt-4.1-nano"
 LLM_PROMPTS_GENERATE_QUESTIONS = "interview_practice_app/LLM_prompts/generate_questions"
@@ -82,14 +82,19 @@ class LLM_Manager:
         reraise=True,
     )
 
-    def _safe_api_call(self, instructions_text: str, input_text: str, response_format: type[BaseModel]) -> BaseModel:
+    def _safe_api_call(
+        self,
+        messages: List[Dict[str, str]],
+        response_format: type[BaseModel],
+        temperature: float = 1.0,
+    ) -> BaseModel:
         """
         Internal wrapper for API call with retries.
 
         Args:
-            instructions_text (str): The system instructions for the LLM.
-            input_text (str): The user input text.
+            messages: List of {"role": "...", "content": "..."} payloads.
             response_format (type[BaseModel]): The Pydantic model class to enforce structure.
+            temperature (float): The temperature to use for the API call.
 
         Returns:
             BaseModel: The parsed response instance of the specified model.
@@ -99,9 +104,8 @@ class LLM_Manager:
         """
         response = self._client.responses.parse(
             model=OPENAI_MODEL,
-            instructions=instructions_text,
-            input=input_text,
-            temperature=1,
+            input=messages,
+            temperature=temperature,
             text_format=response_format,
         )
         if not response.output_parsed:
@@ -113,6 +117,7 @@ class LLM_Manager:
         job_description: str,
         number_of_questions: int,
         difficulty_level: str,
+        temperature: float = 1.0,
         output_path: str | None = None
     ) -> QuestionsList:
         """
@@ -130,7 +135,7 @@ class LLM_Manager:
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_GENERATE_QUESTIONS))
         template = env.get_template("prompt_chain_of_thought.txt")
         
-        LLM_instructions = template.render(
+        system_instructions = template.render(
             {
                 "job_description": job_description, 
                 "number_of_questions": number_of_questions, 
@@ -138,11 +143,25 @@ class LLM_Manager:
             }
         )
         
+        messages = [
+            {
+                "role": "system", 
+                "content": system_instructions
+            },
+            {
+                "role": "user", 
+                "content": (
+                    "Here is the job description you must base questions on:\n\n"
+                    f"{job_description}"
+                ),
+            }
+        ]
+
         st.write("Generating question(s) using OpenAI Responses API - please wait...")
         questions_list = self._safe_api_call(
-            instructions_text=LLM_instructions,
-            input_text=job_description,
-            response_format=QuestionsList
+            messages=messages,
+            response_format=QuestionsList,
+            temperature=temperature
         )
         # Extract company/job from first question for filename (fallback to defaults)
         first_question = questions_list.questions[0] if questions_list.questions else None
@@ -201,17 +220,26 @@ class LLM_Manager:
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_EVALUATE_ANSWERS))
         template = env.get_template("prompt_chain_of_thought.txt")
 
-        LLM_instructions = template.render(
+        system_instructions = template.render(
             {
                 "question": question.question,
                 "answer_guide": question.answer_guide,
-                "user_answer": user_answer
             }
         )
+
+        messages = [
+            {
+                "role": "system", 
+                "content": system_instructions
+            },
+            {
+                "role": "user", 
+                "content": user_answer
+            }
+        ]
         
         feedback = self._safe_api_call(
-            instructions_text=LLM_instructions,
-            input_text=user_answer,
+            messages=messages,
             response_format=Feedback
         )
         return feedback

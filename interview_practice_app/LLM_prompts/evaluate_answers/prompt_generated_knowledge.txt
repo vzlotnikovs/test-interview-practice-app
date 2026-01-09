@@ -7,10 +7,7 @@ Question:
 Answer Guide (key expectations):
 {{ answer_guide }}
 
-Candidate’s Answer:
-{{ user_answer }}
-
-Step 1: Compare the candidate’s answer to the answer guide, focusing on the clarity, completeness, and factual alignment of their response.
+Step 1: Compare the user answer provided to the answer guide, focusing on the clarity, completeness, and factual alignment of their response.
 Step 2: Provide objective, constructive feedback in under 100 words that:
 
 Highlights strengths and accurate reasoning.

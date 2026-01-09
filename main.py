@@ -18,6 +18,8 @@ def init_state() -> None:
         st.session_state.step2_confirmed = False
     if "questions_generated" not in st.session_state:
         st.session_state.questions_generated = False
+    if "temperature" not in st.session_state:
+        st.session_state.temperature = 1.0
 
 def main() -> None:
     """
@@ -58,13 +60,13 @@ def main() -> None:
         st.success("Job description saved from text box successfully.")
 
     if st.session_state.job_description:
-        st.subheader("Step 2: Define the number and difficulty of questions to be generated for your practice interview.")
+        st.subheader("Step 2: Define the number, difficulty, and creativity of questions to be generated for your practice interview.")
         
         number_of_questions = st.number_input(
-            "Number of questions",
+            "Number of questions (up to 5)",
             min_value=1,
-            max_value=10,
-            value=5,
+            max_value=5,
+            value=3,
             key="num_questions"
         )
         difficulty_level = st.selectbox(
@@ -73,20 +75,29 @@ def main() -> None:
             key="difficulty"
         )
         
+        temperature = st.slider(
+            "Temperature (Creativity)",
+            min_value=0.0,
+            max_value=2.0,
+            value=1.0,
+            step=0.1,
+            key="temperature"
+        )
+        
         def confirm_step2() -> None:
             """Callback to confirm Step 2 completion."""
             st.session_state.step2_confirmed = True
             st.success("Step 2 confirmed successfully.")
         
         st.button(
-            "Confirm number & difficulty of questions",
+            "Confirm number, difficulty and creativity of questions",
             key="step2_button",
             on_click=confirm_step2
         )
         if st.session_state.step2_confirmed:
             st.success("Step 2 confirmed successfully.")
             st.subheader("Step 3: Generate questions using OpenAI API.")
-            generated_questions = st.button("Generate", on_click=llm_manager.generate_questions, args=(st.session_state.job_description, st.session_state.num_questions, st.session_state.difficulty))
+            generated_questions = st.button("Generate", on_click=llm_manager.generate_questions, args=(st.session_state.job_description, st.session_state.num_questions, st.session_state.difficulty, st.session_state.temperature))
             if generated_questions:
                 st.session_state.generated_questions = generated_questions
                 st.success("Questions generated successfully.")

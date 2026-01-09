@@ -12,15 +12,12 @@ Answer Guide: Should explain that it rewrites commit history and moves commits o
 Candidate’s Answer: “It merges one branch into another.”
 Feedback: The answer mixes concepts of merge and rebase. Under rebase, commits are replayed onto a new base, not merged. Needs deeper understanding of commit history changes.
 
-Now, follow the same style and tone for the evaluation below.
+Now, follow the same style and tone to evaluate the user answer provided.
 
 Question:
 {{ question }}
 
 Answer Guide:
 {{ answer_guide }}
-
-Candidate’s Answer:
-{{ user_answer }}
 
 Produce feedback in under 100 words, focusing on correctness, completeness, and clarity. Output only the feedback.

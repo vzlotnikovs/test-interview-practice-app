@@ -27,9 +27,6 @@ Example 2:
 
 Now, use the examples above as a reference and follow these instructions:
 
-Job Description:
-{{ job_description }}
-
-Step 1: Identify "company_name" and "job_title" from the job description (use "Undefined" if not found).
+Step 1: using the job description provided by the user, identify "company_name" and "job_title" (use "Undefined" if not found).
 Step 2: Generate exactly {{ number_of_questions }} interview questions matching {{ difficulty_level }} difficulty.
 Step 3: Present the output in JSON format using the same fields as the examples. Nothing else should be included. "category" must be exactly one of "technical", "behavioral", or "situational". 
