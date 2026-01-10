@@ -12,7 +12,7 @@ from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel, ValidationError, field_validator
-from typing import List, Dict, Any
+from typing import List, Dict
 
 OPENAI_MODEL = "gpt-4.1-nano"
 
@@ -128,7 +128,7 @@ class LLM_Manager:
         Returns:
             str: A formatted string containing LLM_Manager details.
         """
-        return f"""
+        return """
         LLM Manager for interview practice (configured for OpenAI).
         """
 

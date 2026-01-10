@@ -1,4 +1,6 @@
 import streamlit as st
+from typing import List, Any
+from interview_practice_app.LLM_manager_class import Question, Feedback, LLM_Manager
 
 question_review_options = ["Accept the question as-is", "Modify the question and accept it with modifications", "Reject the question"]
 
@@ -12,14 +14,14 @@ class Interview_Manager:
     - save_feedback: Allows the user to save the feedback from LLM once a practice session is completed.
 
     """
-    def __init__(self, list_of_questions: List[Any] = []) -> None:
+    def __init__(self, list_of_questions: List[Question] | None = None) -> None:
         """
         Initializes a new Interview_Manager instance.
 
         Args:
-            list_of_questions (List[Any], optional): A list of initial questions. Defaults to [].
+            list_of_questions (List[Question] | None, optional): A list of initial questions. Defaults to None.
         """
-        self._list_of_questions = list_of_questions
+        self._list_of_questions = list_of_questions or []
 
     def __str__(self) -> str:
         """
@@ -30,7 +32,7 @@ class Interview_Manager:
         """
         return "Interview Manager for interview practice."
 
-    def practice_interview(self, questions_file_path: str, llm_manager: "LLM_Manager") -> None:
+    def practice_interview(self, questions_file_path: str, llm_manager: LLM_Manager) -> None:
         """
         Allows the user to practice answering the questions and get feedback from LLM.
 

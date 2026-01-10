@@ -1,6 +1,5 @@
 import streamlit as st
 from dotenv import load_dotenv
-import os
 import chardet
 from io import StringIO
 from interview_practice_app.LLM_manager_class import LLM_Manager
