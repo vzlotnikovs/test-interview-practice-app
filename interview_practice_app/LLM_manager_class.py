@@ -17,11 +17,15 @@ from typing import List, Dict
 OPENAI_MODEL = "gpt-4.1-nano"
 
 LLM_PROMPTS_GENERATE_QUESTIONS = "interview_practice_app/LLM_prompts/generate_questions"
+GENERATE_QUESTIONS_PROMPT = "prompt_chain_of_thought.txt"
+
 LLM_PROMPTS_EVALUATE_ANSWERS = "interview_practice_app/LLM_prompts/evaluate_answers"
+EVALUATE_ANSWERS_PROMPT = "prompt_chain_of_thought.txt"
+
 OUTPUT_DIR = "interview_practice_app/output"
 
-MAX_JOB_DESCRIPTION_LENGTH = 2000
-MAX_ANSWER_CHARACTERS = 2000
+MAX_JOB_DESCRIPTION_LENGTH = 20000
+MAX_ANSWER_CHARACTERS = 20000
 ALLOWED_DIFFICULTIES = {"Easy", "Medium", "Hard"}
 
 class JobConfig(BaseModel):
@@ -287,7 +291,7 @@ class LLM_Manager:
             raise
         
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_GENERATE_QUESTIONS))
-        template = env.get_template("prompt_chain_of_thought.txt")
+        template = env.get_template(GENERATE_QUESTIONS_PROMPT)
         
         system_instructions = template.render(
             {
@@ -382,7 +386,7 @@ class LLM_Manager:
             raise
         
         env = Environment(loader=FileSystemLoader(LLM_PROMPTS_EVALUATE_ANSWERS))
-        template = env.get_template("prompt_chain_of_thought.txt")
+        template = env.get_template(EVALUATE_ANSWERS_PROMPT)
 
         system_instructions = template.render(
             {
