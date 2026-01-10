@@ -25,6 +25,15 @@ MAX_ANSWER_CHARACTERS = 2000
 ALLOWED_DIFFICULTIES = {"Easy", "Medium", "Hard"}
 
 class JobConfig(BaseModel):
+    """
+    Configuration model for job processing and question generation.
+
+    Attributes:
+        job_description (str): The raw text of the job description.
+        number_of_questions (int): The number of questions to generate (1-5).
+        difficulty_level (str): The desired difficulty level (Easy, Medium, Hard).
+        temperature (float): The sampling temperature (0.0 - 2.0).
+    """
     job_description: str
     number_of_questions: int
     difficulty_level: str
@@ -33,6 +42,18 @@ class JobConfig(BaseModel):
     @field_validator("job_description")
     @classmethod
     def jd_length_and_nonempty(cls, v: str) -> str:
+        """
+        Validates that the job description is not empty and within length limits.
+
+        Args:
+            v (str): The job description string.
+
+        Returns:
+            str: The validated and stripped job description.
+
+        Raises:
+            ValueError: If empty or too long.
+        """
         v = v.strip()
         if not v:
             raise ValueError("Job description cannot be empty.")
@@ -46,6 +67,18 @@ class JobConfig(BaseModel):
     @field_validator("number_of_questions")
     @classmethod
     def num_q_range(cls, v: int) -> int:
+        """
+        Validates that the number of questions is between 1 and 5.
+
+        Args:
+            v (int): The number of questions.
+
+        Returns:
+            int: The validated number.
+
+        Raises:
+            ValueError: If out of range.
+        """
         if not (1 <= v <= 5):
             raise ValueError("Number of questions must be between 1 and 5.")
         return v
@@ -53,6 +86,18 @@ class JobConfig(BaseModel):
     @field_validator("difficulty_level")
     @classmethod
     def difficulty_allowlist(cls, v: str) -> str:
+        """
+        Validates that the difficulty level is one of the allowed values.
+
+        Args:
+            v (str): The difficulty level string.
+
+        Returns:
+            str: The title-cased difficulty level.
+
+        Raises:
+            ValueError: If invalid.
+        """
         # Normalize to proper case: "Easy", "Medium", "Hard"
         # We assume the UI sends title-case, but let's be robust
         v_title = v.title()
@@ -63,16 +108,46 @@ class JobConfig(BaseModel):
     @field_validator("temperature")
     @classmethod
     def temperature_range(cls, v: float) -> float:
+        """
+        Validates that the temperature is between 0.0 and 2.0.
+
+        Args:
+            v (float): The temperature value.
+
+        Returns:
+            float: The validated temperature.
+
+        Raises:
+            ValueError: If out of range.
+        """
         if not (0.0 <= v <= 2.0):
             raise ValueError("Temperature must be between 0.0 and 2.0.")
         return v
 
 class AnswerPayload(BaseModel):
+    """
+    Model for validating user answer input.
+
+    Attributes:
+        answer (str): The user's answer text.
+    """
     answer: str
 
     @field_validator("answer")
     @classmethod
     def answer_length_and_nonempty(cls, v: str) -> str:
+        """
+        Validates that the answer is not empty and within length limits.
+
+        Args:
+            v (str): The answer string.
+
+        Returns:
+            str: The validated and stripped answer.
+
+        Raises:
+            ValueError: If empty or too long.
+        """
         v = v.strip()
         if not v:
             raise ValueError("Answer cannot be empty.")
@@ -195,6 +270,10 @@ class LLM_Manager:
 
         Returns:
             QuestionsList: A list of questions generated based on the job description.
+        
+        Raises:
+            ValidationError: If input validation fails.
+            ValueError: If API response is empty.
         """
         try:
             job_config = JobConfig(
@@ -291,6 +370,10 @@ class LLM_Manager:
 
         Returns:
             Feedback: The feedback object containing the feedback text.
+        
+        Raises:
+            ValidationError: If answer validation fails.
+            ValueError: If API response is empty.
         """
         try:
             answer_payload = AnswerPayload(answer=user_answer)
