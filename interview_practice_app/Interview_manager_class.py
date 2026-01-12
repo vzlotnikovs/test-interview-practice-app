@@ -1,6 +1,6 @@
 import streamlit as st
-from typing import List, Any
-from interview_practice_app.LLM_manager_class import Question, Feedback, LLM_Manager
+from typing import List
+from interview_practice_app.LLM_manager_class import Question, LLM_Manager
 
 question_review_options = ["Accept the question as-is", "Modify the question and accept it with modifications", "Reject the question"]
 

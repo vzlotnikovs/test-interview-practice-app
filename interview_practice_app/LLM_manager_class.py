@@ -17,10 +17,10 @@ from typing import List, Dict
 OPENAI_MODEL = "gpt-4.1-nano"
 
 LLM_PROMPTS_GENERATE_QUESTIONS = "interview_practice_app/LLM_prompts/generate_questions"
-GENERATE_QUESTIONS_PROMPT = "prompt_chain_of_thought.txt"
+GENERATE_QUESTIONS_PROMPT = "prompt_self_refinement.txt"
 
 LLM_PROMPTS_EVALUATE_ANSWERS = "interview_practice_app/LLM_prompts/evaluate_answers"
-EVALUATE_ANSWERS_PROMPT = "prompt_chain_of_thought.txt"
+EVALUATE_ANSWERS_PROMPT = "prompt_self_refinement.txt"
 
 OUTPUT_DIR = "interview_practice_app/output"
 

@@ -96,8 +96,13 @@ def main() -> None:
         if st.session_state.step2_confirmed:
             st.success("Step 2 confirmed successfully.")
             st.subheader("Step 3: Generate questions using OpenAI API.")
-            generated_questions = st.button("Generate", on_click=llm_manager.generate_questions, args=(st.session_state.job_description, st.session_state.num_questions, st.session_state.difficulty, st.session_state.temperature))
-            if generated_questions:
+            if st.button("Generate"):
+                generated_questions = llm_manager.generate_questions(
+                    st.session_state.job_description,
+                    st.session_state.num_questions,
+                    st.session_state.difficulty,
+                    st.session_state.temperature
+                )
                 st.session_state.generated_questions = generated_questions
                 st.success("Questions generated successfully.")
             
