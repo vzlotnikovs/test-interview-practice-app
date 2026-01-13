@@ -26,7 +26,7 @@ Target audience: user preparing for a job interview.
 
 ### Prerequisites / Dependencies
 
-- Python 3.14 or higher.
+- Python 3.13 or higher.
 - An OpenAI API key. 
 - See pyproject.toml for full list of dependencies.
 
